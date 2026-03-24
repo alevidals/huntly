@@ -1,5 +1,11 @@
-import { relations, sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { desc, relations, sql } from "drizzle-orm";
+import {
+  check,
+  index,
+  integer,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 
 export const usersSchema = sqliteTable("users", {
   id: text("id").primaryKey(),
@@ -87,9 +93,51 @@ export const verificationsSchema = sqliteTable(
   (table) => [index("verifications_identifier_idx").on(table.identifier)],
 );
 
+export const applicationsSchema = sqliteTable(
+  "applications",
+  {
+    id: text("id")
+      .primaryKey()
+      .$default(() => crypto.randomUUID()),
+    companyName: text("company_name").notNull(),
+    position: text("position").notNull(),
+    status: text("status", {
+      enum: ["pending", "in_progress", "rejected", "accepted"],
+    })
+      .notNull()
+      .default("pending"),
+    recruiterName: text("recruiter_name"),
+    recruiterEmail: text("recruiter_email"),
+    recruiterPhone: text("recruiter_phone"),
+    appliedAt: text("applied_at").notNull(),
+    description: text("description"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => usersSchema.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("applications_userId_appliedAt_idx").on(
+      table.userId,
+      desc(table.appliedAt),
+    ),
+    index("applications_userId_status_idx").on(table.userId, table.status),
+    check(
+      "applications_status_check",
+      sql`${table.status} IN ('pending', 'in_progress', 'rejected', 'accepted')`,
+    ),
+  ],
+);
+
 export const usersRelations = relations(usersSchema, ({ many }) => ({
   sessions: many(sessionsSchema),
   accounts: many(accountsSchema),
+  applications: many(applicationsSchema),
 }));
 
 export const sessionsRelations = relations(sessionsSchema, ({ one }) => ({
@@ -105,3 +153,18 @@ export const accountsRelations = relations(accountsSchema, ({ one }) => ({
     references: [usersSchema.id],
   }),
 }));
+
+export const applicationsRelations = relations(
+  applicationsSchema,
+  ({ one }) => ({
+    users: one(usersSchema, {
+      fields: [applicationsSchema.userId],
+      references: [usersSchema.id],
+    }),
+  }),
+);
+
+export type InsertApplication = Omit<
+  typeof applicationsSchema.$inferInsert,
+  "id" | "createdAt" | "updatedAt"
+>;
