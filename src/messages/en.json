@@ -1,3 +1,31 @@
 {
-  "welcome": "Welcome to the application!"
+  "welcome": "Welcome to the application!",
+  "applications": {
+    "companyName": "Company name",
+    "position": "Position",
+    "status": "Status",
+    "appliedAt": "Application date",
+    "recruiter": "Recruiter",
+    "actions": "Actions",
+    "inProgress": "In progress",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "listOfApplications": "List of applications",
+    "creationDialog": {
+      "title": "Create new application",
+      "description": "Complete the form to create a new application",
+      "form": {
+        "companyName": "Company name",
+        "position": "Position",
+        "status": "Status",
+        "appliedAt": "Application date",
+        "recruiterName": "Recruiter name",
+        "recruiterEmail": "Recruiter email",
+        "recruiterPhone": "Recruiter phone",
+        "description": "Description",
+        "cancel": "Cancel",
+        "create": "Add"
+      }
+    }
+  }
 }

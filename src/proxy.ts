@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/features/auth/services/get-session";
 import { PREFERRED_LOCALE_COOKIE } from "@/shared/lib/i18n/constants";
 import { getLocaleFromBrowser } from "@/shared/lib/i18n/get-locale-from-browser";
 import { getLocaleFromValue } from "@/shared/lib/i18n/get-locale-from-value";
@@ -14,6 +15,15 @@ type SetPreferredLocaleCookieParams = {
   response: NextResponse;
   locale: string;
 };
+
+const PROTECTED_ROUTES = ["/dashboard"] as const;
+
+function isProtectedRoute(pathname: string): boolean {
+  return PROTECTED_ROUTES.some(
+    (protectedRoute) =>
+      pathname === protectedRoute || pathname.startsWith(`${protectedRoute}/`),
+  );
+}
 
 function getRedirectPathname({
   pathname,
@@ -52,12 +62,36 @@ export async function proxy(request: NextRequest) {
 
   const firstSegment = pathname.split("/")[1] ?? "";
   const pathnameLocale = getLocaleFromValue({ locale: firstSegment });
+  const cookieLocale = getLocaleFromValue({
+    locale: request.cookies.get(PREFERRED_LOCALE_COOKIE)?.value,
+  });
+  const fallbackLocale = cookieLocale ?? getLocaleFromBrowser({ request });
+  const protectedPathname = pathnameLocale
+    ? getRedirectPathname({ pathname, firstSegment })
+    : pathname;
+  const locale = pathnameLocale ?? fallbackLocale;
 
-  if (pathnameLocale) {
-    const cookieLocale = getLocaleFromValue({
-      locale: request.cookies.get(PREFERRED_LOCALE_COOKIE)?.value,
+  if (isProtectedRoute(protectedPathname)) {
+    const session = await getSession({
+      headers: request.headers,
     });
 
+    if (!session) {
+      const redirectUrl = request.nextUrl.clone();
+
+      redirectUrl.pathname = getLocalizedPathname({
+        locale,
+        pathname: "/",
+      });
+
+      const response = NextResponse.redirect(redirectUrl);
+      setPreferredLocaleCookie({ response, locale });
+
+      return response;
+    }
+  }
+
+  if (pathnameLocale) {
     if (cookieLocale === pathnameLocale) {
       return NextResponse.next();
     }
@@ -68,10 +102,6 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  const fallbackLocale =
-    getLocaleFromValue({
-      locale: request.cookies.get(PREFERRED_LOCALE_COOKIE)?.value,
-    }) ?? getLocaleFromBrowser({ request });
   const redirectPathname = getRedirectPathname({ pathname, firstSegment });
   const redirectUrl = request.nextUrl.clone();
 

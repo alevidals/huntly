@@ -3,9 +3,13 @@ import "server-only";
 import { headers } from "next/headers";
 import { auth } from "@/shared/lib/auth/server";
 
-export async function getSession() {
+type GetSessionParams = {
+  headers?: Headers;
+};
+
+export async function getSession(params?: GetSessionParams) {
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: params?.headers ?? (await headers()),
   });
 
   return session;

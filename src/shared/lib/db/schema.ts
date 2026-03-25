@@ -102,10 +102,10 @@ export const applicationsSchema = sqliteTable(
     companyName: text("company_name").notNull(),
     position: text("position").notNull(),
     status: text("status", {
-      enum: ["pending", "in_progress", "rejected", "accepted"],
+      enum: ["inProgress", "rejected", "accepted"],
     })
       .notNull()
-      .default("pending"),
+      .default("inProgress"),
     recruiterName: text("recruiter_name"),
     recruiterEmail: text("recruiter_email"),
     recruiterPhone: text("recruiter_phone"),
@@ -164,6 +164,7 @@ export const applicationsRelations = relations(
   }),
 );
 
+export type Application = typeof applicationsSchema.$inferSelect;
 export type InsertApplication = Omit<
   typeof applicationsSchema.$inferInsert,
   "id" | "createdAt" | "updatedAt"

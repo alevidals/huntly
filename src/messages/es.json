@@ -1,3 +1,31 @@
 {
-  "welcome": "Bienvenido a la aplicación!"
+  "welcome": "Bienvenido a la aplicación!",
+  "applications": {
+    "companyName": "Nombre de la empresa",
+    "position": "Posición",
+    "status": "Estado",
+    "appliedAt": "Fecha de aplicación",
+    "recruiter": "Reclutador/a",
+    "actions": "Acciones",
+    "inProgress": "En progreso",
+    "accepted": "Aceptada",
+    "rejected": "Rechazada",
+    "listOfApplications": "Lista de aplicaciones",
+    "creationDialog": {
+      "title": "Crear nueva aplicación",
+      "description": "Complete el formulario para crear una nueva aplicación",
+      "form": {
+        "companyName": "Nombre de la empresa",
+        "position": "Posición",
+        "status": "Estado",
+        "appliedAt": "Fecha de aplicación",
+        "recruiterName": "Nombre del reclutador/a",
+        "recruiterEmail": "Email del reclutador/a",
+        "recruiterPhone": "Teléfono del reclutador/a",
+        "description": "Descripción",
+        "cancel": "Cancelar",
+        "create": "Añadir"
+      }
+    }
+  }
 }
