@@ -13,6 +13,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@formatjs/intl-localematcher": "0.8.2",
     "@libsql/client": "0.17.2",
     "@tabler/icons-react": "3.40.0",
     "better-auth": "1.5.6",
@@ -20,6 +21,7 @@
     "clsx": "2.1.1",
     "drizzle-orm": "0.45.1",
     "lucide-react": "0.577.0",
+    "negotiator": "1.0.0",
     "next": "16.2.1",
     "radix-ui": "1.4.3",
     "react": "19.2.4",
@@ -34,6 +36,7 @@
     "@biomejs/biome": "2.2.0",
     "@next/env": "16.2.1",
     "@tailwindcss/postcss": "4",
+    "@types/negotiator": "0.6.4",
     "@types/node": "20",
     "@types/react": "19",
     "@types/react-dom": "19",

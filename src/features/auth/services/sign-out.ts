@@ -3,8 +3,19 @@
 import { cookies, headers } from "next/headers";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { auth } from "@/shared/lib/auth/server";
+import { DEFAULT_LOCALE } from "@/shared/lib/i18n/constants";
+import { getLocalizedPathname } from "@/shared/lib/i18n/get-localized-pathname";
 
-export async function signOut() {
+type SignOutParams = {
+  redirectTo?: string;
+};
+
+export async function signOut({ redirectTo }: SignOutParams = {}) {
+  const fallbackRedirectTo = getLocalizedPathname({
+    locale: DEFAULT_LOCALE,
+    pathname: "/",
+  });
+
   try {
     await auth.api.signOut({
       headers: await headers(),
@@ -16,6 +27,6 @@ export async function signOut() {
     const cookieStore = await cookies();
     cookieStore.delete("huntly_session_token");
   } finally {
-    redirect("/");
+    redirect(redirectTo ?? fallbackRedirectTo);
   }
 }
